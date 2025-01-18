@@ -1,0 +1,22 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="container">
+<h1>{% if type == "create" %}
+			Créer une formation
+		{% else %}
+			Modifier la formation
+		{% endif %}</h1>
+	{{form_start(form)}}
+	{{form_rest(form)}}
+	{% if type == "create" %}
+		<input type="submit" value="Créer" class="btn btn-primary">
+	{% else %}
+		<input type="submit" value="Modifier" class="btn btn-warning">
+	{% endif %}
+	{{form_end(form)}}
+    </div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block header %}
+	{{parent()}}
+	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+		<div class="offcanvas offcanvas-end" tabindex="-1" id="profile">
+			<div class="offcanvas-header">
+				<h5 class="offcanvas-title">Information personnelle</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+			</div>
+			<div class="offcanvas-body text-center">
+				<div class="my-3">
+					{% for profile in profiles %}
+						<img class="img-fluid rounded-circle" src="{{ asset('uploads/brochures/' ~ profile.brochureFilename) }}" alt="Photo de profile" width="200" height="200" fill="currentColor">
+					</div>
+					<div class="my-3">
+						<a href="/profile/{{profile.id}}" class="btn btn-warning" title="Modifier">
+							éditer la photo de profile
+						</a>
+					{% endfor %}
+				</div>
+				<div class="my-3">{{app.user.email}}</div>
+				<div class="my-3">
+					<a href="/logout" class="btn" style="color: #42446E;">Déconnexion</a>
+				</div>
+			</div>
+		</div>
+	{% else %}
+		<div class="offcanvas offcanvas-end" tabindex="-1" id="profile">
+			<div class="offcanvas-header">
+				<h5 class="offcanvas-title">Connexion</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+			</div>
+			<div class="offcanvas-body">
+				{% if error %}
+					<div class="alert alert-danger">{{error.messageKey}}</div>
+				{% endif %}
+
+				<form method="POST" class="container">
+					<label for="username">E-mail</label>
+					<input type="text" id="e-mail" name="_username" value="{{last_username}}" class="form-control" required>
+
+					<label for="password">Mot de passe</label>
+					<input type="password" id="password" name="_password" class="form-control" required>
+
+					<input type="submit" value="Connexion" class="btn btn-primary mt-2"></input>
+				</form>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+	<div class="text-center" style="margin-top: 70px; margin-bottom: 200px;font-family: DM sans;">
+		<p class="fs-1 mb-0" style="color: var(--Solid-Heading, #42446E);">Pour toute questions n'ésiter pas à me contacter par mail ou par téléphone:</p>
+		<p><a href="mailto:loukaspoirier@gmail.com" class="fs-1 mb-0" style="background: var(--Gradient-Heading, linear-gradient(90deg, #13B0F5 -2.06%, #E70FAA 100%));
+			        background-clip: text;
+			        -webkit-background-clip: text;
+			        -webkit-text-fill-color: transparent;">loukaspoirier@gmail.com</a></p>
+		<p><a href="tel:+0643311090" class="fs-1 mb-0" style="background: var(--Gradient-Heading, linear-gradient(90deg, #13B0F5 -2.06%, #E70FAA 100%));
+			        background-clip: text;
+			        -webkit-background-clip: text;
+			        -webkit-text-fill-color: transparent;">06 43 31 10 90</a></p>
+	</div>
+
+{% endblock %}

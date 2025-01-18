@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block header %}
+	{{parent()}}
+	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+		<div class="offcanvas offcanvas-end" tabindex="-1" id="profile">
+			<div class="offcanvas-header">
+				<h5 class="offcanvas-title">Information personnelle</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+			</div>
+			<div class="offcanvas-body text-center">
+				<div class="my-3">
+					{% for profile in profiles %}
+						<img class="img-fluid rounded-circle" src="{{ asset('uploads/brochures/' ~ profile.brochureFilename) }}" alt="Photo de profile" width="200" height="200" fill="currentColor">
+					</div>
+					<div class="my-3">
+						<a href="/profile/{{profile.id}}" class="btn btn-warning" title="Modifier">
+							éditer la photo de profile
+						</a>
+					{% endfor %}
+				</div>
+				<div class="my-3">{{app.user.email}}</div>
+				<div class="my-3">
+					<a href="/logout" class="btn" style="color: #42446E;">Déconnexion</a>
+				</div>
+			</div>
+		</div>
+	{% else %}
+		<div class="offcanvas offcanvas-end" tabindex="-1" id="profile">
+			<div class="offcanvas-header">
+				<h5 class="offcanvas-title">Connexion</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+			</div>
+			<div class="offcanvas-body">
+				{% if error %}
+					<div class="alert alert-danger">{{error.messageKey}}</div>
+				{% endif %}
+
+				<form method="POST" class="container">
+					<label for="username">E-mail</label>
+					<input type="text" id="e-mail" name="_username" value="{{last_username}}" class="form-control" required>
+
+					<label for="password">Mot de passe</label>
+					<input type="password" id="password" name="_password" class="form-control" required>
+
+					<input type="submit" value="Connexion" class="btn btn-primary mt-2"></input>
+				</form>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+	{% for label, messages in app.flashes %}
+		{% for message in messages %}
+			<div>
+				<div class="alert alert-{{label}}">
+					{{message}}
+				</div>
+			</div>
+		{% endfor %}
+	{% endfor %}
+	<div class="container mt-2" style="font-family: Poppins;">
+		{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+			<a class="btn" href="/tech_stack/create" style="color: #42446E;font-weight: 700;">
+				<h2>Ajouter une nouvelle compétence</h2>
+			</a>
+		{% endif %}
+		<div class="row">
+			<div class="col-sm-7 mb-5">
+				<h1 class="mt-5" style="color: #42446E;font-weight: 700;">Mes compétences</h1>
+				<p class="fs-5" style="color: var(--dark-content, #666);">Les technologies que j'ai utilisé récemment
+				</p>
+			</div>
+		</div>
+		<div class="row">
+			{% for skill in skills %}
+				<div class="col-sm-2 my-5 d-none d-md-block">
+					<img src="{{ asset('uploads/brochures/' ~ skill.brochureFilename) }}" width="120" height="120" alt="image de la compétence">
+					{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+						<div class="mb-1">
+							<a href="/tech_stack/edit/{{skill.id}}" class="btn btn-warning" title="Modifier">modifier
+							</a>
+						</div>
+						<div class="mb-1">
+							<a href="/tech_stack/delete/{{skill.id}}" class="btn btn-danger" title="Supprimer">supprimer
+							</a>
+						</div>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+		<div id="carouselExampleAutoplaying" class="carousel slide d-md-none" data-bs-ride="carousel">
+				<div class="carousel-inner">
+					{% for skill in skills %}
+						<div class="carousel-item active w-100">
+							<img class="w-100" src="{{ asset('uploads/brochures/' ~ skill.brochureFilename) }}" width="120" height="120" alt="image de la compétence">
+							{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+							
+							<div class="mb-1 w-100">
+								<a href="/tech_stack/edit/{{skill.id}}" class="btn btn-warning" title="Modifier">modifier
+								</a>
+							</div>
+							<div class="mb-1 w-100">
+								<a href="/tech_stack/delete/{{skill.id}}" class="btn btn-danger" title="Supprimer">supprimer
+								</a>
+							</div>
+							{% endif %}
+						</div>
+					{% endfor %}
+				</div>
+				<button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+					<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+					<span class="visually-hidden">Previous</span>
+				</button>
+				<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+					<span class="carousel-control-next-icon" aria-hidden="true"></span>
+					<span class="visually-hidden">Next</span>
+				</button>
+			</div>
+	</div>
+{% endblock %}

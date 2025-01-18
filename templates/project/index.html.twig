@@ -1,0 +1,151 @@
+{% extends "base.html.twig" %}
+
+{% block header %}
+{{parent()}}
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+	<div class="offcanvas offcanvas-end" tabindex="-1" id="profile">
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title">Information personnelle</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+		</div>
+		<div class="offcanvas-body text-center">
+			<div class="my-3">
+				{% for profile in profiles %}
+					<img class="img-fluid rounded-circle" src="{{ asset('uploads/brochures/' ~ profile.brochureFilename) }}" alt="Photo de profile" width="200" height="200" fill="currentColor">
+				</div>
+				<div class="my-3">
+					<a href="/profile/{{profile.id}}" class="btn btn-warning" title="Modifier">
+						éditer la photo de profile
+					</a>
+				{% endfor %}
+			</div>
+			<div class="my-3">{{app.user.email}}</div>
+			<div class="my-3">
+				<a href="/logout" class="btn" style="color: #42446E;">Déconnexion</a>
+			</div>
+		</div>
+	</div>
+{% else %}
+	<div class="offcanvas offcanvas-end" tabindex="-1" id="profile">
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title">Connexion</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+		</div>
+		<div class="offcanvas-body">
+			{% if error %}
+				<div class="alert alert-danger">{{error.messageKey}}</div>
+			{% endif %}
+
+			<form method="POST" class="container">
+				<label for="username">E-mail</label>
+				<input type="text" id="e-mail" name="_username" value="{{last_username}}" class="form-control" required>
+
+				<label for="password">Mot de passe</label>
+				<input type="password" id="password" name="_password" class="form-control" required>
+
+				<input type="submit" value="Connexion" class="btn btn-primary mt-2"></input>
+		</form>
+	</div>
+</div>{% endif %}{% endblock %}{% block body %}{% for label, messages in app.flashes %}
+{% for message in messages %}
+	<div>
+		<div class="alert alert-{{label}}">
+			{{message}}
+		</div>
+	</div>
+{% endfor %}{% endfor %}<div class="container mt-2" style="font-family: Poppins;">
+
+<div class="mb-5">
+	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+		<a class="btn" href="/project/create" style="color: #42446E;font-weight: 700;">
+			<h2>Ajouter un nouveau projet</h2>
+		</a>
+	{% endif %}
+	<h1 class="mt-5" style="color: #42446E;font-weight: 700;">Projets</h1>
+	<div class="text-end">
+		<a class="btn" href="/project/tri" style="color: #42446E;font-weight: 700;">
+			Tri du plus récent
+		</a>
+		<a class="btn" href="/project/reverseTri" style="color: #42446E;font-weight: 700;">
+			Tri du plus ancien
+		</a>
+	</div>
+	<p class="fs-5" style="color: var(--dark-content, #666);">Tous les projets que j'ai fait jusqu'à présent</p>
+	<form action="{{ path('project_search') }}" method="get">
+		<input type="text" id="name" name="name" placeholder="Recherche d'un projet" value="{{ app.request.query.get('name') }}">
+		<input class="btn" value="Rechercher" type="submit" style="color: #42446E;font-weight: 700;"></input>
+	</form>
+
+</div>
+<div class="row row-cols-1 row-cols-md-3 g-4 mt-5">
+
+	{% for project in projects %}
+
+		<div class="col">
+			<div class="card m-3" style="border-radius: 20px; box-shadow: 2px 2px 100px 0px rgba(0, 0, 0, 0.20);" id="card">
+				<img src="{{ asset('uploads/brochures/' ~ project.brochureFilename) }}" class="card-img-top img-fluid" style="border-radius: 20px 20px 0px 0px;" alt="image du projet">
+				<div class="card-body">
+					<p class="card-title fs-3">{{project.name}}</p>
+					<p class="card-text" style="color: var(--dark-content, #666);">{{project.description}}</p>
+					<p class="card-text" style="color: var(--dark-content, #666);">
+						<span class="fw-bold">Lien Git :</span>
+						<a target="blank" href="{{project.link}}">{{project.link}}</a>
+					</p>
+					<p class="card-text" style="color: var(--Solid-Heading, #42446E);">
+						<span class="fw-bold">Compétence :</span>
+						{% for skill in project.skills %}
+							{{skill}}
+						{% endfor %}
+					</p>
+
+					{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+						<div class="row">
+							<div class="col-lg-6 mb-1">
+								<a href="/project/edit/{{project.id}}" class="btn btn-warning" title="Modifier">modifier
+								</a>
+							</div>
+							<div class="col-lg-6 mb-1">
+								<a href="/project/delete/{{project.id}}" class="btn btn-danger" title="Supprimer">supprimer
+								</a>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+</div></div>{% endblock %}{% block javascripts %}<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script><script>
+const body = document.body;
+const themeBtn = document.getElementById('themeBtn');
+
+// Récupérer le thème actuel
+const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+const profileDiv = document.getElementById('profile');
+const cardDiv = document.querySelectorAll(".card");
+
+if (currentTheme) {
+body.classList.add(currentTheme);
+profileDiv.classList.add(currentTheme);
+for (let i = 0; i < cardDiv.length; i++) {
+cardDiv[i].classList.add(currentTheme);
+}
+}
+
+// Basculer entre les thèmes
+themeBtn.addEventListener('click', () => {
+if (body.classList.contains('dark-mode')) {
+body.classList.remove('dark-mode');
+profileDiv.classList.remove('dark-mode');
+for (let i = 0; i < cardDiv.length; i++) {
+cardDiv[i].classList.remove('dark-mode');
+}
+localStorage.setItem('theme', 'light-mode');
+} else {
+body.classList.add('dark-mode');
+profileDiv.classList.add('dark-mode');
+for (let i = 0; i < cardDiv.length; i++) {
+cardDiv[i].classList.add('dark-mode');
+}
+localStorage.setItem('theme', 'dark-mode');
+}
+});</script>{% endblock %}
